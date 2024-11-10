@@ -12,7 +12,7 @@ net = cv2.dnn.readNetFromCaffe(config_path, model_path)
 # net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
 # net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
-confidence_threshold = 0.5
+confidence_threshold = 0.1
 person_class_id = 15
 
 stream = requests.get(stream_url, stream=True)
