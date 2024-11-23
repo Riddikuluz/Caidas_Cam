@@ -1,0 +1,4 @@
+/aws/certs/
+/aws/__pycache__/
+/fallDetection/__pycache__/
+.env
