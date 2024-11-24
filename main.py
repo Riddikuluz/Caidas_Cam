@@ -30,7 +30,7 @@ def streaming_worker():
                 listener.response_received = False
         except Exception as e:
             print(f"⚠️ Error en el hilo de streaming: {e}")
-        time.sleep(1)  # Reducir la carga del CPU
+        time.sleep(1)
     
     print("⏹️ Hilo de streaming detenido.")
 

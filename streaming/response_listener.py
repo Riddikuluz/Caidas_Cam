@@ -1,4 +1,3 @@
-import time
 import json
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import os
