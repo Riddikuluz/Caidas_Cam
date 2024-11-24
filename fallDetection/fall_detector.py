@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import subprocess
+from send_alert import send_alert
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -445,15 +445,13 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                 stage = "standing"
                 counter_three +=1
                 print(Point_of_action, y)
-                fall_detected = True
-                break
+                send_alert()
 
             if Point_of_action_X >=  320 and Point_of_action_X < 520 and Point_of_action_Y > 380 and Point_of_action_Y < 480 and standing and stage == 'falling':     #count4                
                 cv2.putText(image, 'fall' , ( 320,240 ),cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA )
                 stage = "standing"
                 counter_four +=1
-                fall_detected = True
-                break
+                send_alert()
                 
         except:
               pass
@@ -488,5 +486,5 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
     cap.release()
     cv2.destroyAllWindows()
 
-    print(f"Resultado final: {'Caída detectada' if fall_detected else 'Sin caídas'}")
-    exit(fall_detected)
+    #print(f"Resultado final: {'Caída detectada' if fall_detected else 'Sin caídas'}")
+    #exit(fall_detected)

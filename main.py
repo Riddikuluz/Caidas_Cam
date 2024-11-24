@@ -2,66 +2,61 @@ import threading
 import time
 from dotenv import load_dotenv
 from fallDetection.run_fall_detection import run_fall_detection
-from aws.send_alert import send_alert
-from aws.response_listener import ResponseListener
-from aws.stream_manager import start_streaming 
+from streaming.response_listener import ResponseListener
+from streaming.stream_manager import start_streaming
 
 load_dotenv()
 
 stop_detection_event = threading.Event()
 
 def detection_worker():
-    """Hilo para ejecutar la detección de caídas."""
-    while not stop_detection_event.is_set():
-        try:
-            fall_detected = run_fall_detection()
-            if fall_detected:
-                print("⚠️ Caída detectada. Enviando alerta...")
-                send_alert()
-                fall_detected = False
-        except Exception as e:
-            print(f"⚠️ Error en run_fall_detection: {e}")
-        time.sleep(1)  # Reducir la carga del CPU
-
-    print("⏹️ Hilo de detección detenido.")
+    try:
+        print("📹 Iniciando detección de caídas...")
+        run_fall_detection()
+    except Exception as e:
+        print(f"⚠️ Error en la detección de caídas: {e}")
 
 def streaming_worker():
+    """Hilo encargado de manejar las solicitudes de streaming."""
     listener = ResponseListener(stop_detection_event)
+    print("🎧 Escuchando respuestas para streaming...")
+    
     while not stop_detection_event.is_set():
-        if listener.response_received:
-            print("🎥 Solicitud de inicio de streaming recibida.")
-            start_streaming(stop_detection_event)
-            print("✅ Streaming finalizado.")
-            main()
-            listener.response_received = False
-        time.sleep(1)
+        try:
+            if listener.response_received:
+                print("🎥 Solicitud de inicio de streaming recibida.")
+                start_streaming(stop_detection_event)
+                print("✅ Streaming finalizado.")
+                listener.response_received = False
+        except Exception as e:
+            print(f"⚠️ Error en el hilo de streaming: {e}")
+        time.sleep(1)  # Reducir la carga del CPU
     
     print("⏹️ Hilo de streaming detenido.")
 
-
 def main():
-    """Función principal para iniciar los hilos."""
     print("🏁 Iniciando sistema de detección de caídas...")
     
-    # Hilo para la detección de caídas
-    detection_thread = threading.Thread(target=detection_worker, daemon=True)
-    detection_thread.start()
+    threads = []
 
-    # Hilo para el streaming
+    detection_thread = threading.Thread(target=detection_worker, daemon=True)
+    threads.append(detection_thread)
+
     streaming_thread = threading.Thread(target=streaming_worker, daemon=True)
-    streaming_thread.start()
+    threads.append(streaming_thread)
+
+    for thread in threads:
+        thread.start()
 
     try:
         while True:
-            time.sleep(1)  # Mantener el programa corriendo
+            time.sleep(1)
     except KeyboardInterrupt:
         print("\n⛔ Finalizando sistema...")
-        stop_detection_event.set()  # Detener los hilos y el streaming
-        if detection_thread.is_alive():
-            detection_thread.join()
-        if streaming_thread.is_alive():
-            streaming_thread.join()
+        stop_detection_event.set()
     finally:
+        for thread in threads:
+            thread.join()
         print("✅ Sistema finalizado.")
 
 if __name__ == "__main__":

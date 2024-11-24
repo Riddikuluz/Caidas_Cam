@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Variable global para gestionar el proceso de FFmpeg
+
 ffmpeg_process = None
 
 def start_streaming(stop_event):
@@ -35,7 +35,6 @@ def start_streaming(stop_event):
         f'{os.getenv("INGEST_URL")}{os.getenv("STREAM_KEY")}'
     ]
     
-    # Inicia el proceso de FFmpeg
     ffmpeg_process = subprocess.Popen(ffmpeg_command)
 
     try:
