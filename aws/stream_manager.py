@@ -1,49 +1,61 @@
-import cv2
 import subprocess
-import time
 import os
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
-STREAM_TIMEOUT = os.getenv("STREAM_TIMEOUT")
 
-def start_streaming(timeout=300):
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("Error: No se pudo acceder a la cámara.")
+# Variable global para gestionar el proceso de FFmpeg
+ffmpeg_process = None
+
+def start_streaming(stop_event):
+    """Inicia el streaming del escritorio usando FFmpeg."""
+    global ffmpeg_process
+    
+    if ffmpeg_process and ffmpeg_process.poll() is None:
+        print("⚠️ Streaming ya está en curso.")
         return
-
+    
     ffmpeg_command = [
-        'ffmpeg',
-        '-y',
-        '-f', 'rawvideo',
-        '-vcodec', 'rawvideo',
-        '-pix_fmt', 'bgr24',
-        '-s', '640x480',
-        '-r', '30',
-        '-i', '-',
-        '-c:v', 'libx264',
-        '-pix_fmt', 'yuv420p',
-        '-preset', 'veryfast',
-        '-f', 'flv',
-        '-tune', 'zerolatency',
-        '-b:v', '800k',
-        '-maxrate', '800k',
-        '-bufsize', '1200k',
+        "ffmpeg",
+        "-y",
+        "-f", "gdigrab",
+        "-offset_x", "1920",  # Coordenada X de inicio
+        "-offset_y", "0",     # Coordenada Y de inicio
+        "-video_size", "1920x1080",
+        "-i", "desktop",
+        "-framerate", "30",
+        "-c:v", "libx264",
+        "-preset", "veryfast",
+        "-pix_fmt", "yuv420p",
+        "-b:v", "800k",
+        "-maxrate", "800k",
+        "-bufsize", "1200k",
+        "-f", "flv",
         f'{os.getenv("INGEST_URL")}{os.getenv("STREAM_KEY")}'
     ]
-
-    process = subprocess.Popen(ffmpeg_command, stdin=subprocess.PIPE)
-    start_time = time.time()
+    
+    # Inicia el proceso de FFmpeg
+    ffmpeg_process = subprocess.Popen(ffmpeg_command)
 
     try:
-        while time.time() - start_time < timeout:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frame_resized = cv2.resize(frame, (640, 480))
-            process.stdin.write(frame_resized.tobytes())
+        print("🎥 Streaming del escritorio iniciado. Esperando mensaje de detención...")
+        while not stop_event.is_set():
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n⛔ Streaming detenido manualmente.")
     finally:
-        cap.release()
-        process.stdin.close()
-        process.wait()
+        stop_streaming()
+
+def stop_streaming():
+    global ffmpeg_process
+    if ffmpeg_process:
+        print("🛑 Deteniendo el proceso de FFmpeg...")
+        ffmpeg_process.terminate()
+        ffmpeg_process.wait()
+        ffmpeg_process.kill()
+        ffmpeg_process = None
+        print("✅ Streaming finalizado.")
+    else:
+        print("⚠️ No hay un proceso de streaming en ejecución")
+
