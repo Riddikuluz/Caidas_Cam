@@ -258,7 +258,6 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             # Calculate angle - knee_r
             angle_knee_r = calculate_angle(hip_r, knee_r, ankle_r)
             
-             #발 사이값
             Point_of_action_LEFT_X = int( 
                 ((dot_LEFT_FOOT_INDEX_X +  dot_LEFT_HEEL_X)/2) )
             
