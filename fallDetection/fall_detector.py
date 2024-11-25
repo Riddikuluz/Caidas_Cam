@@ -258,21 +258,17 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             # Calculate angle - knee_r
             angle_knee_r = calculate_angle(hip_r, knee_r, ankle_r)
             
-             #발 사이값
             Point_of_action_LEFT_X = int( 
                 ((dot_LEFT_FOOT_INDEX_X +  dot_LEFT_HEEL_X)/2) )
             
             Point_of_action_LEFT_Y = int( 
                 ((dot_LEFT_FOOT_INDEX_Y+   dot_LEFT_HEEL_Y)/2) )
-            
                
             Point_of_action_RIGHT_X = int( 
                 ((dot_RIGHT_FOOT_INDEX_X +  dot_RIGHT_HEEL_X)/2) )
             
             Point_of_action_RIGHT_Y = int( 
                 ((dot_RIGHT_FOOT_INDEX_Y+   dot_RIGHT_HEEL_Y)/2) )           
-            
-                       
             
            #between feet
             Point_of_action_X = int ( (Point_of_action_LEFT_X +  Point_of_action_RIGHT_X)/2 )
@@ -485,6 +481,3 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
     cap.release()
     cv2.destroyAllWindows()
-
-    #print(f"Resultado final: {'Caída detectada' if fall_detected else 'Sin caídas'}")
-    #exit(fall_detected)

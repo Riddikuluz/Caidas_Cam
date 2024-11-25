@@ -1,4 +1,3 @@
 /certs/
-/streaming/__pycache__/
 /fallDetection/__pycache__/
 .env
