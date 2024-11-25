@@ -25,4 +25,4 @@ def send_alert():
     }
     client.publish(TOPIC, json.dumps(message), 1)
     client.disconnect()
-    print("📤 Alerta enviada con éxito.")
+    print("Alerta enviada con éxito.")

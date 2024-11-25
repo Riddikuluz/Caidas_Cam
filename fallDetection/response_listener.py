@@ -14,7 +14,7 @@ KEY_PATH = os.getenv("KEY_PATH")
 class ResponseListener:
     def __init__(self, stop_event):
         self.response_received = False
-        self.stop_event = stop_event  # Evento para detener el streaming
+        self.stop_event = stop_event
         self.client = self._initialize_client()
         self.client.subscribe(TOPIC, 1, self.message_callback)
 
@@ -30,7 +30,6 @@ class ResponseListener:
         return client
 
     def message_callback(self, client, userdata, message):
-        """Procesa los mensajes MQTT."""
         try:
             payload = json.loads(message.payload.decode("utf-8"))
             action = payload.get("action")
@@ -41,13 +40,13 @@ class ResponseListener:
                 self.stop_event.clear()
 
             elif action == "stop_stream":
-                print("🛑 Solicitud de detención de streaming recibida.")
+                print("Solicitud de detención de streaming recibida.")
                 self.stop_event.set()
 
             elif payload.get("message"):
-                print(f"📥 Mensaje recibido: {payload['message']}")
+                print(f"Mensaje recibido: {payload['message']}")
         except json.JSONDecodeError:
-            print("⚠️ Error al procesar el mensaje.")
+            print("Error al procesar el mensaje.")
 
     def disconnect(self):
         """Desconecta el cliente MQTT."""
