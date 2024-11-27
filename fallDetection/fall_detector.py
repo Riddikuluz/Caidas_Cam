@@ -20,7 +20,17 @@ def calculate_angle(a,b,c):
         
     return int(angle) 
 
-cap = cv2.VideoCapture(0)
+# Configuración de captura de video
+cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))  # Cambiar formato a MJPG
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # Ancho
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)  # Alto
+
+# Crear una ventana normal
+cv2.namedWindow('Fall Detection', cv2.WINDOW_NORMAL)
+
+# Redimensionar la ventana para que ocupe la mayor parte de la pantalla (sin entrar en pantalla completa)
+cv2.resizeWindow('Fall Detection', 1280, 720)
 
 # Curl counter variables
 counter = 0
@@ -475,7 +485,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                 mp_drawing.DrawingSpec(color=(255,255,255), thickness=2, circle_radius=2), 
                                 mp_drawing.DrawingSpec(color=(0,0,0), thickness=2, circle_radius=2))               
         
-        cv2.imshow('Mediapipe Feed', image)
+        cv2.imshow('Fall Detection', image)
        
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
