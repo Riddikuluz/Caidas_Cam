@@ -48,7 +48,7 @@ def start_streaming():
         "ffmpeg",
         "-y",
         "-f", "x11grab",
-        "-video_size", "640x480",
+        "-video_size", "1280x720",
         "-i", ":0.0",
         "-framerate", "30",
         "-c:v", "libx264",
