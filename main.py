@@ -29,7 +29,7 @@ def streaming_worker():
         try:
             if listener.response_received and not stop_streaming_event.is_set():
                 print("Solicitud de inicio de streaming recibida.")
-                start_streaming()
+                start_streaming(listener.stream_type)
                 listener.response_received = False
         except Exception as e:
             print(f"Error en el hilo de streaming: {e}")
@@ -37,12 +37,39 @@ def streaming_worker():
 
     print("Hilo de streaming detenido.")
 
-def start_streaming():
+def stop_streaming():
+    global ffmpeg_process
+    
+    if ffmpeg_process:
+        try:
+            ffmpeg_process.terminate()  
+            time.sleep(5)
+            if ffmpeg_process.poll() is None:
+                ffmpeg_process.kill()  
+            ffmpeg_process.wait()
+            print("FFmpeg detenido correctamente.")
+        except Exception as e:
+            print(f"Error al detener FFmpeg: {e}")
+        finally:
+            ffmpeg_process = None
+    else:
+        print("No hay un proceso FFmpeg activo.")
+
+
+def start_streaming(stream_type):
     global ffmpeg_process
     stop_streaming_event.clear()
-
-    debug_ffmpeg()
     stop_streaming()
+
+    if stream_type == "monitor":
+        ingest_url = os.getenv("INGEST_URL_Monitor")
+        stream_key = os.getenv("STREAM_KEY_Monitor")
+    elif stream_type == "alerta":
+        ingest_url = os.getenv("INGEST_URL_Alerta")
+        stream_key = os.getenv("STREAM_KEY_Alerta")
+    else:
+        print("Tipo de streaming no valido.")
+        return
 
     ffmpeg_command = [
         "ffmpeg",
@@ -58,10 +85,10 @@ def start_streaming():
         "-maxrate", "800k",
         "-bufsize", "1200k",
         "-f", "flv",
-        f'{os.getenv("INGEST_URL")}{os.getenv("STREAM_KEY")}'
+        f"{ingest_url}{stream_key}"
     ]
 
-    print(f"Iniciando streaming con comando: {' '.join(ffmpeg_command)}")
+    print(f"Iniciando streaming ({stream_type}) con comando: {' '.join(ffmpeg_command)}")
 
     try:
         ffmpeg_process = subprocess.Popen(
@@ -76,45 +103,15 @@ def start_streaming():
                 print("FFmpeg termino inesperadamente.")
                 break
             time.sleep(1)
+
+        if stop_streaming_event.is_set() and ffmpeg_process.poll() is None:
+            print("Deteniendo streaming con comando 'q'.")
+            ffmpeg_process.stdin.write(b'q\n')
+            ffmpeg_process.stdin.flush()
     except Exception as e:
         print(f"Error durante el streaming: {e}")
     finally:
         stop_streaming()
-
-def stop_streaming():
-    global ffmpeg_process
-
-    if ffmpeg_process:
-        print("Intentando detener FFmpeg...")
-        try:
-            if ffmpeg_process.poll() is None:
-                ffmpeg_process.send_signal(signal.SIGINT)
-                time.sleep(2)
-                if ffmpeg_process.poll() is None:
-                    print("FFmpeg sigue activo. Forzando terminacion...")
-                    ffmpeg_process.terminate()
-                    time.sleep(2)
-                    if ffmpeg_process.poll() is None:
-                        ffmpeg_process.kill()
-            ffmpeg_process.wait()
-        except Exception as e:
-            print(f"Error al detener FFmpeg: {e}")
-        finally:
-            ffmpeg_process = None
-            print("FFmpeg detenido.")
-    else:
-        print("No hay un proceso FFmpeg activo.")
-
-def debug_ffmpeg():
-    try:
-        output = subprocess.check_output(["pgrep", "-a", "ffmpeg"]).decode()
-        print(f"Procesos de FFmpeg detectados:\n{output}")
-        for line in output.splitlines():
-            pid = int(line.split()[0])
-            os.kill(pid, signal.SIGKILL)
-            print(f"Proceso {pid} terminado.")
-    except subprocess.CalledProcessError:
-        print("No se detectaron procesos FFmpeg activos.")
 
 def main():
     print("Iniciando sistema de deteccion de caidas...")
@@ -126,7 +123,7 @@ def main():
     streaming_thread.start()
 
     try:
-        while True:
+        while not stop_detection_event.is_set():
             time.sleep(1)
     except KeyboardInterrupt:
         print("\nFinalizando sistema...")
