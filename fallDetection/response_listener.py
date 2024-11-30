@@ -11,12 +11,13 @@ TOPIC = os.getenv("TOPIC")
 CA_PATH = os.getenv("CA_PATH")
 CERT_PATH = os.getenv("CERT_PATH")
 KEY_PATH = os.getenv("KEY_PATH")
+
 class ResponseListener:
     def __init__(self, stop_event):
         self.response_received = False
-        self.stop_event = stop_event  # Evento para detener el streaming
+        self.stop_event = stop_event
         self.client = self._initialize_client()
-        self.client.subscribe(TOPIC, 1, self.message_callback)
+        self.stream_type = None
 
     def _initialize_client(self):
         client = AWSIoTMQTTClient(CLIENT_ID)
@@ -26,30 +27,49 @@ class ResponseListener:
         client.configureDrainingFrequency(2)
         client.configureConnectDisconnectTimeout(10)
         client.configureMQTTOperationTimeout(5)
-        client.connect()
+        
+        try:
+            client.connect()
+            print("✅ Cliente MQTT conectado.")
+            client.subscribe(TOPIC, 1, self.message_callback)
+        except Exception as e:
+            print(f"⚠️ Error al conectar el cliente MQTT: {e}")
+
         return client
 
     def message_callback(self, client, userdata, message):
-        """Procesa los mensajes MQTT."""
         try:
             payload = json.loads(message.payload.decode("utf-8"))
             action = payload.get("action")
+            print(f"📥 Mensaje recibido: {payload}")
 
-            if action == "start_stream":
-                print("✅ Solicitud de inicio de streaming recibida.")
+            if action == "start_stream_monitor":
+                print("✅ Solicitud de inicio de streaming (Monitor) recibida.")
                 self.response_received = True
+                self.stream_type = "monitor"
+                self.stop_event.clear()
+
+            elif action == "start_stream_alerta":
+                print("✅ Solicitud de inicio de streaming (Alerta) recibida.")
+                self.response_received = True
+                self.stream_type = "alerta"
                 self.stop_event.clear()
 
             elif action == "stop_stream":
                 print("🛑 Solicitud de detención de streaming recibida.")
                 self.stop_event.set()
 
-            elif payload.get("message"):
-                print(f"📥 Mensaje recibido: {payload['message']}")
+            else:
+                print("⚠️ Acción desconocida.")
         except json.JSONDecodeError:
-            print("⚠️ Error al procesar el mensaje.")
+            print("⚠️ JSON inválido.")
+
+        except Exception as e:
+            print(f"⚠️ Error en el callback del mensaje: {e}")
 
     def disconnect(self):
-        """Desconecta el cliente MQTT."""
-        self.client.disconnect()
-        print("✅ Cliente MQTT desconectado.")
+        try:
+            self.client.disconnect()
+            print("✅ Cliente MQTT desconectado.")
+        except Exception as e:
+            print(f"⚠️ Error al desconectar el cliente MQTT: {e}")
