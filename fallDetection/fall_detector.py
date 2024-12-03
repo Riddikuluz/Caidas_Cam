@@ -23,14 +23,14 @@ def calculate_angle(a,b,c):
 # Configuración de captura de video
 cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))  # Cambiar formato a MJPG
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # Ancho
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)  # Alto
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)  # Ancho
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)  # Alto
 
 # Crear una ventana normal
 cv2.namedWindow('Fall Detection', cv2.WINDOW_NORMAL)
 
 # Redimensionar la ventana para que ocupe la mayor parte de la pantalla (sin entrar en pantalla completa)
-cv2.resizeWindow('Fall Detection', 1280, 720)
+cv2.resizeWindow('Fall Detection', 1024, 768)
 
 # Curl counter variables
 counter = 0
@@ -297,43 +297,43 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
             # Visualize angle - elbow_l
             cv2.putText(image, str(angle_elbow_l), 
-                           tuple(np.multiply(elbow_l, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(elbow_l, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
              # Visualize angle - elbow_r
             cv2.putText(image, str(angle_elbow_r), 
-                           tuple(np.multiply(elbow_r, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(elbow_r, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
              # Visualize angle - shoulder_l
             cv2.putText(image, str(angle_shoulder_l), 
-                           tuple(np.multiply(shoulder_l, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(shoulder_l, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
              # Visualize angle - shoulder_r
             cv2.putText(image, str(angle_shoulder_r), 
-                           tuple(np.multiply(shoulder_r, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(shoulder_r, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
              # Visualize angle - hip_l
             cv2.putText(image, str(angle_hip_l), 
-                           tuple(np.multiply(hip_l, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(hip_l, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
              # Visualize angle - hip_r
             cv2.putText(image, str(angle_hip_r), 
-                           tuple(np.multiply(hip_r, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(hip_r, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA
                                 )
             
             # Visualize angle - knee_l
             cv2.putText(image, str(angle_knee_l), 
-                           tuple(np.multiply(knee_l, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(knee_l, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
             # Visualize angle - knee_r
             cv2.putText(image, str(angle_knee_r), 
-                           tuple(np.multiply(knee_r, [1280, 720]).astype(int)), 
+                           tuple(np.multiply(knee_r, [1024, 768]).astype(int)), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
             # Visualize dot - dot_NOSE
