@@ -67,6 +67,9 @@ def start_streaming(stream_type):
     elif stream_type == "alerta":
         ingest_url = os.getenv("INGEST_URL_Alerta")
         stream_key = os.getenv("STREAM_KEY_Alerta")
+    elif stream_type == "ambiental":
+        ingest_url = os.getenv("INGEST_URL_Ambiental")
+        stream_key = os.getenv("STREAM_KEY_Ambiental")
     else:
         print("Tipo de streaming no valido.")
         return
