@@ -54,6 +54,12 @@ class ResponseListener:
                 self.response_received = True
                 self.stream_type = "alerta"
                 self.stop_event.clear()
+                
+            elif action == "start_stream_ambiental":
+                print("Solicitud de inicio de streaming (Ambiental) recibida.")
+                self.response_received = True
+                self.stream_type = "ambiental"
+                self.stop_event.clear()
 
             elif action == "stop_stream":
                 print("🛑 Solicitud de detención de streaming recibida.")

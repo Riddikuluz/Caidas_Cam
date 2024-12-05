@@ -68,6 +68,9 @@ def start_streaming(stream_type):
     elif stream_type == "alerta":
         ingest_url = os.getenv("INGEST_URL_Alerta")
         stream_key = os.getenv("STREAM_KEY_Alerta")
+    elif stream_type == "ambiental":
+        ingest_url = os.getenv("INGEST_URL_Ambiental")
+        stream_key = os.getenv("STREAM_KEY_Ambiental")
     else:
         print("⚠️ Tipo de streaming no válido.")
         return
@@ -78,7 +81,7 @@ def start_streaming(stream_type):
         "-f", "gdigrab",
         "-offset_x", "0",
         "-offset_y", "0",
-        "-video_size", "640x480",
+        "-video_size", "1280x720",
         "-i", "desktop",
         "-framerate", "30",
         "-c:v", "libx264",
