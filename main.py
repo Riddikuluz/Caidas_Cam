@@ -81,7 +81,7 @@ def start_streaming(stream_type):
         "-f", "gdigrab",
         "-offset_x", "0",
         "-offset_y", "0",
-        "-video_size", "1280x720",
+        "-video_size", "640x480",
         "-i", "desktop",
         "-framerate", "30",
         "-c:v", "libx264",
