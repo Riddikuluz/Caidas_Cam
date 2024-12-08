@@ -20,9 +20,11 @@ def send_alert():
     client.connect()
 
     message = {
-        "alert": "caida detectada en camara.",
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        "id_dispositivo": "cámara",
+        "tipificacion": "caída",
+        "mensaje": "¡Caída detectada!"
     }
+    
     client.publish(TOPIC, json.dumps(message), 1)
     client.disconnect()
     print("Alerta enviada con éxito.")
