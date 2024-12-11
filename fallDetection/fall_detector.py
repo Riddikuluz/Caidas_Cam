@@ -23,17 +23,6 @@ def calculate_angle(a,b,c):
 # Configuración de captura de video
 cap = cv2.VideoCapture(0)
 
-"""
-cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
-width = 1024
-Wide = 768
-cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, Wide)
-cv2.namedWindow('Fall Detection', cv2.WINDOW_NORMAL)
-cv2.resizeWindow('Fall Detection', width, Wide)
-"""
-
 # Curl counter variables
 counter = 0
 counter_two = 0
