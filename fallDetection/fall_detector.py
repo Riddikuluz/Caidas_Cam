@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 from send_alert import send_alert
+import time
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -24,14 +25,13 @@ cap = cv2.VideoCapture(0)
 
 # Curl counter variables
 counter = 0
-counter_two = 0
-counter_three = 0
-counter_four = 0
 fall = False 
 stage = None
+fall_start_time = None
+time_2_alert = 10
 
 ## Setup mediapipe instance
-with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as pose:
     while cap.isOpened():
         ret, frame = cap.read()
         
@@ -123,58 +123,58 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             dot_NOSE = [ dot_NOSE_X,dot_NOSE_Y]
             
             # dot - LEFT_ARM_WRIST_ELBOW
-            dot_LEFT_ARM_A_X = int( (dot_LEFT_WRIST_X+dot_LEFT_ELBOW_X) / 2)
-            dot_LEFT_ARM_A_Y = int( (dot_LEFT_WRIST_Y+dot_LEFT_ELBOW_Y) / 2)
+            dot_LEFT_ARM_A_X = int((dot_LEFT_WRIST_X+dot_LEFT_ELBOW_X)/2)
+            dot_LEFT_ARM_A_Y = int((dot_LEFT_WRIST_Y+dot_LEFT_ELBOW_Y)/2)
             LEFT_ARM_WRIST_ELBOW = [dot_LEFT_ARM_A_X,dot_LEFT_ARM_A_Y]
             
             # dot - RIGHT_ARM_WRIST_ELBOW
-            dot_RIGHT_ARM_A_X = int( (dot_RIGHT_WRIST_X+dot_RIGHT_ELBOW_X) / 2)
-            dot_RIGHT_ARM_A_Y = int( (dot_RIGHT_WRIST_Y+dot_RIGHT_ELBOW_Y) / 2)
+            dot_RIGHT_ARM_A_X = int((dot_RIGHT_WRIST_X+dot_RIGHT_ELBOW_X)/2)
+            dot_RIGHT_ARM_A_Y = int((dot_RIGHT_WRIST_Y+dot_RIGHT_ELBOW_Y)/2)
             RIGHT_ARM_WRIST_ELBOW = [dot_LEFT_ARM_A_X, dot_LEFT_ARM_A_Y]
             
             # dot - LEFT_ARM_SHOULDER_ELBOW
-            dot_LEFT_ARM_SHOULDER_ELBOW_X = int( (dot_LEFT_SHOULDER_X+dot_LEFT_ELBOW_X) / 2)
-            dot_LEFT_ARM_SHOULDER_ELBOW_Y = int( (dot_LEFT_SHOULDER_Y+dot_LEFT_ELBOW_Y) / 2)
+            dot_LEFT_ARM_SHOULDER_ELBOW_X = int((dot_LEFT_SHOULDER_X+dot_LEFT_ELBOW_X)/2)
+            dot_LEFT_ARM_SHOULDER_ELBOW_Y = int((dot_LEFT_SHOULDER_Y+dot_LEFT_ELBOW_Y)/2)
             LEFT_ARM_SHOULDER_ELBOW = [dot_LEFT_ARM_SHOULDER_ELBOW_X, dot_LEFT_ARM_SHOULDER_ELBOW_Y]
             
             # dot - RIGHT_ARM_SHOULDER_ELBOW
-            dot_RIGHT_ARM_SHOULDER_ELBOW_X = int( (dot_RIGHT_SHOULDER_X+dot_RIGHT_ELBOW_X) / 2)
-            dot_RIGHT_ARM_SHOULDER_ELBOW_Y = int( (dot_RIGHT_SHOULDER_Y+dot_RIGHT_ELBOW_Y) / 2)
+            dot_RIGHT_ARM_SHOULDER_ELBOW_X = int((dot_RIGHT_SHOULDER_X+dot_RIGHT_ELBOW_X)/2)
+            dot_RIGHT_ARM_SHOULDER_ELBOW_Y = int((dot_RIGHT_SHOULDER_Y+dot_RIGHT_ELBOW_Y)/2)
             RIGHT_ARM_SHOULDER_ELBOW = [dot_RIGHT_ARM_SHOULDER_ELBOW_X, dot_RIGHT_ARM_SHOULDER_ELBOW_Y]
             
             # dot - BODY_SHOULDER_HIP
-            dot_BODY_SHOULDER_HIP_X = int( (dot_RIGHT_SHOULDER_X+dot_RIGHT_HIP_X+dot_LEFT_SHOULDER_X+dot_LEFT_HIP_X) / 4)
-            dot_BODY_SHOULDER_HIP_Y = int( (dot_RIGHT_SHOULDER_Y+dot_RIGHT_HIP_Y+dot_LEFT_SHOULDER_Y+dot_LEFT_HIP_Y) / 4)
+            dot_BODY_SHOULDER_HIP_X = int((dot_RIGHT_SHOULDER_X+dot_RIGHT_HIP_X+dot_LEFT_SHOULDER_X+dot_LEFT_HIP_X)/4)
+            dot_BODY_SHOULDER_HIP_Y = int((dot_RIGHT_SHOULDER_Y+dot_RIGHT_HIP_Y+dot_LEFT_SHOULDER_Y+dot_LEFT_HIP_Y)/4)
             BODY_SHOULDER_HIP = [dot_BODY_SHOULDER_HIP_X, dot_BODY_SHOULDER_HIP_Y]
             
             # dot - LEFT_LEG_HIP_KNEE
-            dot_LEFT_LEG_HIP_KNEE_X = int( (dot_LEFT_HIP_X+dot_LEFT_KNEE_X) / 2)
-            dot_LEFT_LEG_HIP_KNEE_Y = int( (dot_LEFT_HIP_Y+dot_LEFT_KNEE_Y) / 2)
+            dot_LEFT_LEG_HIP_KNEE_X = int((dot_LEFT_HIP_X+dot_LEFT_KNEE_X)/2)
+            dot_LEFT_LEG_HIP_KNEE_Y = int((dot_LEFT_HIP_Y+dot_LEFT_KNEE_Y)/2)
             LEFT_LEG_HIP_KNEE = [dot_LEFT_LEG_HIP_KNEE_X, dot_LEFT_LEG_HIP_KNEE_Y]
             
             # dot - RIGHT_LEG_HIP_KNEE
-            dot_RIGHT_LEG_HIP_KNEE_X = int( (dot_RIGHT_HIP_X+dot_RIGHT_KNEE_X) / 2)
-            dot_RIGHT_LEG_HIP_KNEE_Y = int( (dot_RIGHT_HIP_Y+dot_RIGHT_KNEE_Y) / 2)
+            dot_RIGHT_LEG_HIP_KNEE_X = int((dot_RIGHT_HIP_X+dot_RIGHT_KNEE_X)/2)
+            dot_RIGHT_LEG_HIP_KNEE_Y = int((dot_RIGHT_HIP_Y+dot_RIGHT_KNEE_Y)/2)
             RIGHT_LEG_HIP_KNEE = [dot_RIGHT_LEG_HIP_KNEE_X, dot_RIGHT_LEG_HIP_KNEE_Y]
             
             # dot - LEFT_LEG_KNEE_ANKLE
-            dot_LEFT_LEG_KNEE_ANKLE_X = int( (dot_LEFT_ANKLE_X+dot_LEFT_KNEE_X) / 2)
-            dot_LEFT_LEG_KNEE_ANKLE_Y = int( (dot_LEFT_ANKLE_Y+dot_LEFT_KNEE_Y) / 2)
+            dot_LEFT_LEG_KNEE_ANKLE_X = int((dot_LEFT_ANKLE_X+dot_LEFT_KNEE_X)/2)
+            dot_LEFT_LEG_KNEE_ANKLE_Y = int((dot_LEFT_ANKLE_Y+dot_LEFT_KNEE_Y)/2)
             LEFT_LEG_KNEE_ANKLE = [dot_LEFT_LEG_KNEE_ANKLE_X, dot_LEFT_LEG_KNEE_ANKLE_Y]
 
             # dot - RIGHT_LEG_KNEE_ANKLE
-            dot_RIGHT_LEG_KNEE_ANKLE_X = int( (dot_RIGHT_ANKLE_X+dot_RIGHT_KNEE_X) / 2)
-            dot_RIGHT_LEG_KNEE_ANKLE_Y = int( (dot_RIGHT_ANKLE_Y+dot_RIGHT_KNEE_Y) / 2)
+            dot_RIGHT_LEG_KNEE_ANKLE_X = int((dot_RIGHT_ANKLE_X+dot_RIGHT_KNEE_X)/2)
+            dot_RIGHT_LEG_KNEE_ANKLE_Y = int((dot_RIGHT_ANKLE_Y+dot_RIGHT_KNEE_Y)/2)
             RIGHT_LEG_KNEE_ANKLE = [dot_RIGHT_LEG_KNEE_ANKLE_X, dot_RIGHT_LEG_KNEE_ANKLE_Y]
             
             # dot - LEFT_FOOT_INDEX_HEEL
-            dot_LEFT_FOOT_INDEX_HEEL_X = int( (dot_LEFT_FOOT_INDEX_X+dot_LEFT_HEEL_X) / 2)
-            dot_LEFT_FOOT_INDEX_HEEL_Y = int( (dot_LEFT_FOOT_INDEX_Y+dot_LEFT_HEEL_Y) / 2)
-            LEFT_FOOT_INDEX_HEEL = [dot_LEFT_FOOT_INDEX_HEEL_X, dot_LEFT_FOOT_INDEX_HEEL_Y]
+            dot_LEFT_FOOT_INDEX_HEEL_X = int((dot_LEFT_FOOT_INDEX_X+dot_LEFT_HEEL_X)/2)
+            dot_LEFT_FOOT_INDEX_HEEL_Y = int((dot_LEFT_FOOT_INDEX_Y+dot_LEFT_HEEL_Y)/2)
+            LEFT_FOOT_INDEX_HEEL = [dot_LEFT_FOOT_INDEX_HEEL_X,dot_LEFT_FOOT_INDEX_HEEL_Y]
             
             # dot - RIGHT_FOOT_INDEX_HEEL
-            dot_RIGHT_FOOT_INDEX_HEEL_X = int( (dot_RIGHT_FOOT_INDEX_X+dot_RIGHT_HEEL_X) / 2)
-            dot_RIGHT_FOOT_INDEX_HEEL_Y = int( (dot_RIGHT_FOOT_INDEX_Y+dot_RIGHT_HEEL_Y) / 2)
+            dot_RIGHT_FOOT_INDEX_HEEL_X = int((dot_RIGHT_FOOT_INDEX_X+dot_RIGHT_HEEL_X)/2)
+            dot_RIGHT_FOOT_INDEX_HEEL_Y = int((dot_RIGHT_FOOT_INDEX_Y+dot_RIGHT_HEEL_Y)/2)
             RIGHT_FOOT_INDEX_HEEL = [dot_RIGHT_FOOT_INDEX_HEEL_X, dot_RIGHT_FOOT_INDEX_HEEL_Y]
             
             # dot _ UPPER_BODY
@@ -183,13 +183,13 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             UPPER_BODY = [dot_UPPER_BODY_X, dot_UPPER_BODY_Y]
             
             # dot _ LOWER_BODY
-            dot_LOWER_BODY_X = int( (dot_LEFT_LEG_HIP_KNEE_X+dot_RIGHT_LEG_HIP_KNEE_X+dot_LEFT_LEG_KNEE_ANKLE_X+ dot_RIGHT_LEG_KNEE_ANKLE_X+dot_LEFT_FOOT_INDEX_HEEL_X+dot_RIGHT_FOOT_INDEX_HEEL_X )/6 )
-            dot_LOWER_BODY_Y = int( (dot_LEFT_LEG_HIP_KNEE_Y+dot_RIGHT_LEG_HIP_KNEE_Y+dot_LEFT_LEG_KNEE_ANKLE_Y+ dot_RIGHT_LEG_KNEE_ANKLE_Y+dot_LEFT_FOOT_INDEX_HEEL_Y+dot_RIGHT_FOOT_INDEX_HEEL_Y )/6 )
+            dot_LOWER_BODY_X = int((dot_LEFT_LEG_HIP_KNEE_X+dot_RIGHT_LEG_HIP_KNEE_X+dot_LEFT_LEG_KNEE_ANKLE_X+ dot_RIGHT_LEG_KNEE_ANKLE_X+dot_LEFT_FOOT_INDEX_HEEL_X+dot_RIGHT_FOOT_INDEX_HEEL_X)/6)
+            dot_LOWER_BODY_Y = int((dot_LEFT_LEG_HIP_KNEE_Y+dot_RIGHT_LEG_HIP_KNEE_Y+dot_LEFT_LEG_KNEE_ANKLE_Y+ dot_RIGHT_LEG_KNEE_ANKLE_Y+dot_LEFT_FOOT_INDEX_HEEL_Y+dot_RIGHT_FOOT_INDEX_HEEL_Y)/6)
             LOWER_BODY = [dot_LOWER_BODY_X, dot_LOWER_BODY_Y]
             
             # dot _ BODY
-            dot_BODY_X = int( (dot_UPPER_BODY_X + dot_LOWER_BODY_X)/2 )
-            dot_BODY_Y = int( (dot_UPPER_BODY_Y + dot_LOWER_BODY_Y)/2 )
+            dot_BODY_X = int( (dot_UPPER_BODY_X + dot_LOWER_BODY_X)/2)
+            dot_BODY_Y = int( (dot_UPPER_BODY_Y + dot_LOWER_BODY_Y)/2)
             BODY = [dot_BODY_X, dot_BODY_Y]
             
            # ---------------------------  COOLDINATE  ---------------------- 
@@ -259,30 +259,30 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             angle_knee_r = calculate_angle(hip_r, knee_r, ankle_r)
             
             Point_of_action_LEFT_X = int( 
-                ((dot_LEFT_FOOT_INDEX_X +  dot_LEFT_HEEL_X)/2) )
+                ((dot_LEFT_FOOT_INDEX_X + dot_LEFT_HEEL_X)/2))
             
             Point_of_action_LEFT_Y = int( 
-                ((dot_LEFT_FOOT_INDEX_Y+   dot_LEFT_HEEL_Y)/2) )
+                ((dot_LEFT_FOOT_INDEX_Y + dot_LEFT_HEEL_Y)/2))
                
             Point_of_action_RIGHT_X = int( 
-                ((dot_RIGHT_FOOT_INDEX_X +  dot_RIGHT_HEEL_X)/2) )
+                ((dot_RIGHT_FOOT_INDEX_X + dot_RIGHT_HEEL_X)/2))
             
             Point_of_action_RIGHT_Y = int( 
-                ((dot_RIGHT_FOOT_INDEX_Y+   dot_RIGHT_HEEL_Y)/2) )           
+                ((dot_RIGHT_FOOT_INDEX_Y + dot_RIGHT_HEEL_Y)/2))           
             
            #between feet
-            Point_of_action_X = int ( (Point_of_action_LEFT_X +  Point_of_action_RIGHT_X)/2 )
-            Point_of_action_Y = int ( (Point_of_action_LEFT_Y +  Point_of_action_RIGHT_Y)/2 )
+            Point_of_action_X = int ((Point_of_action_LEFT_X +  Point_of_action_RIGHT_X)/2)
+            Point_of_action_Y = int ((Point_of_action_LEFT_Y +  Point_of_action_RIGHT_Y)/2)
             
             #Coordinates between feet
-            Point_of_action = [Point_of_action_X , Point_of_action_Y]
+            Point_of_action = [Point_of_action_X, Point_of_action_Y]
             
              # Visualize angle - Coordinates between feet
             cv2.putText(image, str(Point_of_action), 
                           (Point_of_action_X,Point_of_action_Y) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
                       
-            cv2.circle(image,  (Point_of_action_X , Point_of_action_Y), 5, (0,0,255), -1)
+            cv2.circle(image, (Point_of_action_X, Point_of_action_Y), 5, (0,0,255), -1)
 
             # Visualize angle - elbow_l
             cv2.putText(image, str(angle_elbow_l), 
@@ -312,8 +312,7 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
              # Visualize angle - hip_r
             cv2.putText(image, str(angle_hip_r), 
                            tuple(np.multiply(hip_r, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA
-                                )
+                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             
             # Visualize angle - knee_l
             cv2.putText(image, str(angle_knee_l), 
@@ -327,21 +326,21 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             
             # Visualize dot - dot_NOSE
             cv2.putText(image, str(dot_NOSE), 
-                          (dot_NOSE_X,dot_NOSE_Y) , 
+                          (dot_NOSE_X,dot_NOSE_Y), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_NOSE_X,dot_NOSE_Y), 5, (204,252,0), -1)
+            cv2.circle(image, (dot_NOSE_X,dot_NOSE_Y), 5, (204,252,0), -1)
             
             # Visualize dot - LEFT_ARM_WRIST_ELBO
             cv2.putText(image, str(LEFT_ARM_WRIST_ELBOW), 
                           (dot_LEFT_ARM_A_X,dot_LEFT_ARM_A_Y) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_LEFT_ARM_A_X,dot_LEFT_ARM_A_Y), 5, (204,252,0), -1)
+            cv2.circle(image, (dot_LEFT_ARM_A_X,dot_LEFT_ARM_A_Y), 5, (204,252,0), -1)
             
            # Visualize dot - RIGHT_ARM_WRIST_ELBO
             cv2.putText(image, str(RIGHT_ARM_WRIST_ELBOW), 
                           (dot_RIGHT_ARM_A_X,dot_RIGHT_ARM_A_Y) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_RIGHT_ARM_A_X,dot_RIGHT_ARM_A_Y), 5, (204,252,0), -1)
+            cv2.circle(image, (dot_RIGHT_ARM_A_X,dot_RIGHT_ARM_A_Y), 5, (204,252,0), -1)
     
             # Visualize dot - LEFT_ARM_SHOULDER_ELBOW   
             cv2.putText(image, str(LEFT_ARM_SHOULDER_ELBOW), 
@@ -363,13 +362,13 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             
             # Visualize dot - LEFT_LEG_HIP_KNEE 
             cv2.putText(image, str(LEFT_LEG_HIP_KNEE), 
-                          (dot_LEFT_LEG_HIP_KNEE_X    ,    dot_LEFT_LEG_HIP_KNEE_Y) , 
+                          (dot_LEFT_LEG_HIP_KNEE_X, dot_LEFT_LEG_HIP_KNEE_Y) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
             cv2.circle(image,  (dot_LEFT_LEG_HIP_KNEE_X    ,    dot_LEFT_LEG_HIP_KNEE_Y), 5, (204,252,0), -1)
 
             # Visualize dot - RIGHT_LEG_HIP_KNEE
             cv2.putText(image, str(RIGHT_LEG_HIP_KNEE), 
-                          (dot_RIGHT_LEG_HIP_KNEE_X    ,    dot_RIGHT_LEG_HIP_KNEE_Y) , 
+                          (dot_RIGHT_LEG_HIP_KNEE_X, dot_RIGHT_LEG_HIP_KNEE_Y) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
             cv2.circle(image,  (dot_RIGHT_LEG_HIP_KNEE_X    ,    dot_RIGHT_LEG_HIP_KNEE_Y), 5, (204,252,0), -1)
             
@@ -385,95 +384,99 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
             cv2.circle(image,  (dot_RIGHT_LEG_KNEE_ANKLE_X    ,    dot_RIGHT_LEG_KNEE_ANKLE_Y), 5, (204,252,0), -1)
             
-            # Visualize dot -   LEFT_FOOT_INDEX_HEEL     
+            # Visualize dot - LEFT_FOOT_INDEX_HEEL     
             cv2.putText(image, str(LEFT_FOOT_INDEX_HEEL), 
-                          (dot_LEFT_FOOT_INDEX_HEEL_X    ,    dot_LEFT_FOOT_INDEX_HEEL_Y) , 
+                          (dot_LEFT_FOOT_INDEX_HEEL_X,dot_LEFT_FOOT_INDEX_HEEL_Y) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
                       
-            cv2.circle(image,  (dot_LEFT_FOOT_INDEX_HEEL_X    ,    dot_LEFT_FOOT_INDEX_HEEL_Y), 5, (204,252,0), -1)
+            cv2.circle(image,  (dot_LEFT_FOOT_INDEX_HEEL_X, dot_LEFT_FOOT_INDEX_HEEL_Y), 5, (204,252,0), -1)
             
-            # Visualize dot -   RIGHT_FOOT_INDEX_HEEL
+            # Visualize dot - RIGHT_FOOT_INDEX_HEEL
             cv2.putText(image, str(RIGHT_FOOT_INDEX_HEEL), 
-                          (dot_RIGHT_FOOT_INDEX_HEEL_X    ,    dot_RIGHT_FOOT_INDEX_HEEL_Y) , 
+                          (dot_RIGHT_FOOT_INDEX_HEEL_X,    dot_RIGHT_FOOT_INDEX_HEEL_Y), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)             
             cv2.circle(image,  (dot_RIGHT_FOOT_INDEX_HEEL_X    ,    dot_RIGHT_FOOT_INDEX_HEEL_Y), 5, (204,252,0), -1)
 
-            # Visualize dot -   UPPER_BODY       
+            # Visualize dot - UPPER_BODY       
             cv2.putText(image, str(UPPER_BODY), 
-                          ( dot_UPPER_BODY_X    ,    dot_UPPER_BODY_Y ) , 
+                          ( dot_UPPER_BODY_X, dot_UPPER_BODY_Y ) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (277,220,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_UPPER_BODY_X    ,    dot_UPPER_BODY_Y), 9, (277,220,0), -1)
+            cv2.circle(image,  (dot_UPPER_BODY_X, dot_UPPER_BODY_Y), 9, (277,220,0), -1)
             
-            # Visualize dot -   LOWER_BODY
+            # Visualize dot - LOWER_BODY
             cv2.putText(image, str(LOWER_BODY), 
-                          ( dot_LOWER_BODY_X    ,    dot_LOWER_BODY_Y ) , 
+                          ( dot_LOWER_BODY_X, dot_LOWER_BODY_Y ) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (277,220,0), 1, cv2.LINE_AA)     
-            cv2.circle(image,  (dot_LOWER_BODY_X    ,    dot_LOWER_BODY_Y), 9, (277,220,0), -1)
+            cv2.circle(image,  (dot_LOWER_BODY_X, dot_LOWER_BODY_Y), 9, (277,220,0), -1)
 
-            # Visualize dot -   BODY       
+            # Visualize dot - BODY       
             cv2.putText(image, str(BODY), 
-                          ( dot_BODY_X    ,    dot_BODY_Y ) , 
+                          ( dot_BODY_X ,dot_BODY_Y ) , 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1, cv2.LINE_AA)   
-            cv2.circle(image,  (dot_BODY_X    ,    dot_BODY_Y), 12, (0,0,255), -1)
+            cv2.circle(image,  (dot_BODY_X, dot_BODY_Y), 12, (0,0,255), -1)
 
             #fall case
-            fall = int(Point_of_action_X - dot_BODY_X )
+            fall = Point_of_action_X - dot_BODY_X
+
+            # Verificar que las variables están definidas
+            if Point_of_action_X is None or dot_BODY_X is None:
+                print("Error: Valores indefinidos para Point_of_action_X o dot_BODY_X")
                   
             #case falling and standa
             falling = abs(fall) > 50
-            standing = abs(fall) < 50
+            standing = abs(fall) <= 50
             x = Point_of_action_X
             y = -(1.251396648*x) + 618
 
             if falling:
-                stage="falling"
+                if stage != "falling":  # Detectar el inicio de una nueva caída
+                    stage = "falling"
+                    fall_start_time = time.time()  # Registrar la marca de tiempo inicial
+                    print(f"Inicio de caída detectado en x={x}, y={y}")
+                else:
+                    # Continuar seguimiento de tiempo
+                    try:
+                        elapsed_time = (time.time() - fall_start_time 
+                                        if fall_start_time else 0)
+                    except Exception as e:
+                        print(f"Error al calcular tiempo: {e}")
+                        elapsed_time = 0
 
-            """
-            if Point_of_action_X <  320 and Point_of_action_Y > 240 and standing and stage == 'falling':     #count3            
-                cv2.putText(image, 'fall' , ( 320,240 ),cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA )
-                stage = "standing"
-                counter_three +=1
-                subprocess.run(["python", "./fallDetection/aws/sendAlert.py"])
-    	    """
-
-            if Point_of_action_X < 320 and Point_of_action_X > 100 and  Point_of_action_Y > 390 and Point_of_action_Y < 480 and  standing and stage == 'falling':     #count3            
-                cv2.putText(image, 'fall' , ( 320,240 ),cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA )
-                stage = "standing"
-                counter_three +=1
-                print(Point_of_action, y)
-                send_alert()
-
-            if Point_of_action_X >=  320 and Point_of_action_X < 520 and Point_of_action_Y > 380 and Point_of_action_Y < 480 and standing and stage == 'falling':     #count4                
-                cv2.putText(image, 'fall' , ( 320,240 ),cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 2, cv2.LINE_AA )
-                stage = "standing"
-                counter_four +=1
-                send_alert()
-                
+                    if elapsed_time > time_2_alert:  # Más de 10 segundos en caída
+                        send_alert()
+                        print(f"Alerta enviada después de {elapsed_time:.2f}s")
+                        counter +=1
+                        fall_start_time = None  # Resetear temporizador
+            else:  # Manejo de estado "standing"
+                if stage == "falling":  # Si se estaba cayendo antes
+                    stage = "standing"
+                    print(f"Se ha levantado en x={x}, y={y}")
+                    cv2.putText(image, 'standing', (320, 240), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
+                    fall_start_time = None  # Resetear temporizador
         except:
               pass
             #-------------------------------'
-        """
+        """"""
         # Setup status box
         cv2.rectangle(image, (0,0), (225,73), (245,117,16), -1)
 
         # Rep data
         cv2.putText(image, str(fall), (15,12), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
-        cv2.putText(image, str(counter + counter_two + counter_three + counter_four), 
-                    (10,60), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255,0,255), 2, cv2.LINE_AA)
+        cv2.putText(image, str(counter), 
+                    (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,0,255), 2, cv2.LINE_AA)
 
         # Stage data
         cv2.putText(image, 'distance', (65,12), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
         cv2.putText(image, stage, 
-                    (60,60), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
-        """
+            (60,60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
+        
         # Render detections
         mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                mp_drawing.DrawingSpec(color=(255,255,255), thickness=2, circle_radius=2), 
-                                mp_drawing.DrawingSpec(color=(0,0,0), thickness=2, circle_radius=2))               
+            mp_drawing.DrawingSpec(color=(255,255,255), thickness=2, circle_radius=2), 
+            mp_drawing.DrawingSpec(color=(0,0,0), thickness=2,circle_radius=2))               
         
         cv2.imshow('Mediapipe Feed', image)
        
