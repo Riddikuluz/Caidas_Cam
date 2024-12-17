@@ -191,9 +191,8 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
             dot_BODY_X = int( (dot_UPPER_BODY_X + dot_LOWER_BODY_X)/2)
             dot_BODY_Y = int( (dot_UPPER_BODY_Y + dot_LOWER_BODY_Y)/2)
             BODY = [dot_BODY_X, dot_BODY_Y]
-            
+        
            # ---------------------------  COOLDINATE  ---------------------- 
-            
             # Get coordinates - elbow_l
             shoulder_l = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
             elbow_l = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
@@ -276,144 +275,6 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
             
             #Coordinates between feet
             Point_of_action = [Point_of_action_X, Point_of_action_Y]
-            
-             # Visualize angle - Coordinates between feet
-            cv2.putText(image, str(Point_of_action), 
-                          (Point_of_action_X,Point_of_action_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-                      
-            cv2.circle(image, (Point_of_action_X, Point_of_action_Y), 5, (0,0,255), -1)
-
-            # Visualize angle - elbow_l
-            cv2.putText(image, str(angle_elbow_l), 
-                           tuple(np.multiply(elbow_l, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-             # Visualize angle - elbow_r
-            cv2.putText(image, str(angle_elbow_r), 
-                           tuple(np.multiply(elbow_r, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-             # Visualize angle - shoulder_l
-            cv2.putText(image, str(angle_shoulder_l), 
-                           tuple(np.multiply(shoulder_l, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-             # Visualize angle - shoulder_r
-            cv2.putText(image, str(angle_shoulder_r), 
-                           tuple(np.multiply(shoulder_r, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-             # Visualize angle - hip_l
-            cv2.putText(image, str(angle_hip_l), 
-                           tuple(np.multiply(hip_l, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-             # Visualize angle - hip_r
-            cv2.putText(image, str(angle_hip_r), 
-                           tuple(np.multiply(hip_r, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-            # Visualize angle - knee_l
-            cv2.putText(image, str(angle_knee_l), 
-                           tuple(np.multiply(knee_l, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-            # Visualize angle - knee_r
-            cv2.putText(image, str(angle_knee_r), 
-                           tuple(np.multiply(knee_r, [640, 480]).astype(int)), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            
-            # Visualize dot - dot_NOSE
-            cv2.putText(image, str(dot_NOSE), 
-                          (dot_NOSE_X,dot_NOSE_Y), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image, (dot_NOSE_X,dot_NOSE_Y), 5, (204,252,0), -1)
-            
-            # Visualize dot - LEFT_ARM_WRIST_ELBO
-            cv2.putText(image, str(LEFT_ARM_WRIST_ELBOW), 
-                          (dot_LEFT_ARM_A_X,dot_LEFT_ARM_A_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image, (dot_LEFT_ARM_A_X,dot_LEFT_ARM_A_Y), 5, (204,252,0), -1)
-            
-           # Visualize dot - RIGHT_ARM_WRIST_ELBO
-            cv2.putText(image, str(RIGHT_ARM_WRIST_ELBOW), 
-                          (dot_RIGHT_ARM_A_X,dot_RIGHT_ARM_A_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image, (dot_RIGHT_ARM_A_X,dot_RIGHT_ARM_A_Y), 5, (204,252,0), -1)
-    
-            # Visualize dot - LEFT_ARM_SHOULDER_ELBOW   
-            cv2.putText(image, str(LEFT_ARM_SHOULDER_ELBOW), 
-                          (dot_LEFT_ARM_SHOULDER_ELBOW_X,dot_LEFT_ARM_SHOULDER_ELBOW_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)      
-            cv2.circle(image,  (dot_LEFT_ARM_SHOULDER_ELBOW_X,dot_LEFT_ARM_SHOULDER_ELBOW_Y), 5, (204,252,0), -1)
-            
-            # Visualize dot - RIGHT_ARM_SHOULDER_ELBOW      
-            cv2.putText(image, str(RIGHT_ARM_SHOULDER_ELBOW), 
-                          (dot_RIGHT_ARM_SHOULDER_ELBOW_X,dot_RIGHT_ARM_SHOULDER_ELBOW_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_RIGHT_ARM_SHOULDER_ELBOW_X,dot_RIGHT_ARM_SHOULDER_ELBOW_Y), 5, (204,252,0), -1)
-  
-            # Visualize dot - BODY_SHOULDER_HIP         
-            cv2.putText(image, str(BODY_SHOULDER_HIP), 
-                          (dot_BODY_SHOULDER_HIP_X,dot_BODY_SHOULDER_HIP_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_BODY_SHOULDER_HIP_X,dot_BODY_SHOULDER_HIP_Y), 5, (204,252,0), -1)
-            
-            # Visualize dot - LEFT_LEG_HIP_KNEE 
-            cv2.putText(image, str(LEFT_LEG_HIP_KNEE), 
-                          (dot_LEFT_LEG_HIP_KNEE_X, dot_LEFT_LEG_HIP_KNEE_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_LEFT_LEG_HIP_KNEE_X    ,    dot_LEFT_LEG_HIP_KNEE_Y), 5, (204,252,0), -1)
-
-            # Visualize dot - RIGHT_LEG_HIP_KNEE
-            cv2.putText(image, str(RIGHT_LEG_HIP_KNEE), 
-                          (dot_RIGHT_LEG_HIP_KNEE_X, dot_RIGHT_LEG_HIP_KNEE_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_RIGHT_LEG_HIP_KNEE_X    ,    dot_RIGHT_LEG_HIP_KNEE_Y), 5, (204,252,0), -1)
-            
-            # Visualize dot - LEFT_LEG_KNEE_ANKLE  
-            cv2.putText(image, str(LEFT_LEG_KNEE_ANKLE), 
-                          (dot_LEFT_LEG_KNEE_ANKLE_X    ,    dot_LEFT_LEG_KNEE_ANKLE_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_LEFT_LEG_KNEE_ANKLE_X    ,    dot_LEFT_LEG_KNEE_ANKLE_Y), 5, (204,252,0), -1)
-            
-           # Visualize dot - RIGHT_LEG_KNEE_ANKLE  
-            cv2.putText(image, str(RIGHT_LEG_KNEE_ANKLE), 
-                          (dot_RIGHT_LEG_KNEE_ANKLE_X    ,    dot_RIGHT_LEG_KNEE_ANKLE_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_RIGHT_LEG_KNEE_ANKLE_X    ,    dot_RIGHT_LEG_KNEE_ANKLE_Y), 5, (204,252,0), -1)
-            
-            # Visualize dot - LEFT_FOOT_INDEX_HEEL     
-            cv2.putText(image, str(LEFT_FOOT_INDEX_HEEL), 
-                          (dot_LEFT_FOOT_INDEX_HEEL_X,dot_LEFT_FOOT_INDEX_HEEL_Y) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)
-                      
-            cv2.circle(image,  (dot_LEFT_FOOT_INDEX_HEEL_X, dot_LEFT_FOOT_INDEX_HEEL_Y), 5, (204,252,0), -1)
-            
-            # Visualize dot - RIGHT_FOOT_INDEX_HEEL
-            cv2.putText(image, str(RIGHT_FOOT_INDEX_HEEL), 
-                          (dot_RIGHT_FOOT_INDEX_HEEL_X,    dot_RIGHT_FOOT_INDEX_HEEL_Y), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (204,252,0), 1, cv2.LINE_AA)             
-            cv2.circle(image,  (dot_RIGHT_FOOT_INDEX_HEEL_X    ,    dot_RIGHT_FOOT_INDEX_HEEL_Y), 5, (204,252,0), -1)
-
-            # Visualize dot - UPPER_BODY       
-            cv2.putText(image, str(UPPER_BODY), 
-                          ( dot_UPPER_BODY_X, dot_UPPER_BODY_Y ) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (277,220,0), 1, cv2.LINE_AA)
-            cv2.circle(image,  (dot_UPPER_BODY_X, dot_UPPER_BODY_Y), 9, (277,220,0), -1)
-            
-            # Visualize dot - LOWER_BODY
-            cv2.putText(image, str(LOWER_BODY), 
-                          ( dot_LOWER_BODY_X, dot_LOWER_BODY_Y ) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (277,220,0), 1, cv2.LINE_AA)     
-            cv2.circle(image,  (dot_LOWER_BODY_X, dot_LOWER_BODY_Y), 9, (277,220,0), -1)
-
-            # Visualize dot - BODY       
-            cv2.putText(image, str(BODY), 
-                          ( dot_BODY_X ,dot_BODY_Y ) , 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1, cv2.LINE_AA)   
-            cv2.circle(image,  (dot_BODY_X, dot_BODY_Y), 12, (0,0,255), -1)
 
             #fall case
             fall = Point_of_action_X - dot_BODY_X
@@ -456,20 +317,8 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
                     fall_start_time = None  # Resetear temporizador
         except:
               pass
-            #-------------------------------'
-        """"""
-        # Setup status box
-        cv2.rectangle(image, (0,0), (225,73), (245,117,16), -1)
-
-        # Rep data
-        cv2.putText(image, str(fall), (15,12), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
         cv2.putText(image, str(counter), 
                     (10,60), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,0,255), 2, cv2.LINE_AA)
-
-        # Stage data
-        cv2.putText(image, 'distance', (65,12), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1, cv2.LINE_AA)
         cv2.putText(image, stage, 
             (60,60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 1, cv2.LINE_AA)
         
@@ -478,7 +327,7 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
             mp_drawing.DrawingSpec(color=(255,255,255), thickness=2, circle_radius=2), 
             mp_drawing.DrawingSpec(color=(0,0,0), thickness=2,circle_radius=2))               
         
-        cv2.imshow('Mediapipe Feed', image)
+        cv2.imshow('Fall Detection', image)
        
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
