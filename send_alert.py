@@ -1,6 +1,5 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import json
-import time
 import os
 from dotenv import load_dotenv
 

@@ -1,8 +1,10 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-from send_alert import send_alert
+import platform
 import time
+import main
+from send_alert import send_alert
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -21,8 +23,11 @@ def calculate_angle(a,b,c):
         
     return int(angle) 
 
-# Configuración de captura de video
-cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+# Selección dinámica del backend según el sistema operativo
+if platform.system() != "Linux":
+    cap = cv2.VideoCapture(0)  # Usar backend predeterminado en Windows/macOS
+else:
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
 # Verificar si la cámara se abrió correctamente
 if not cap.isOpened():
@@ -314,12 +319,11 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
             y = -(1.251396648*x) + 618
 
             if falling:
-                if stage != "falling":  # Detectar el inicio de una nueva caída
+                if stage != "falling":
                     stage = "falling"
-                    fall_start_time = time.time()  # Registrar la marca de tiempo inicial
+                    fall_start_time = time.time()
                     print(f"Inicio de caída detectado en x={x}, y={y}")
                 else:
-                    # Continuar seguimiento de tiempo
                     try:
                         elapsed_time = (time.time() - fall_start_time 
                                         if fall_start_time else 0)
@@ -327,18 +331,21 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
                         print(f"Error al calcular tiempo: {e}")
                         elapsed_time = 0
 
-                    if elapsed_time > time_2_alert:  # Más de 10 segundos en caída
-                        send_alert()
-                        print(f"Alerta enviada después de {elapsed_time:.2f}s")
-                        counter +=1
-                        fall_start_time = None  # Resetear temporizador
-            else:  # Manejo de estado "standing"
-                if stage == "falling":  # Si se estaba cayendo antes
+                    if elapsed_time > time_2_alert:
+                        if not main.is_streaming:
+                            send_alert()
+                            print(f"Alerta enviada después de {elapsed_time:.2f}s")
+                            counter +=1
+                            fall_start_time = None
+                        else:
+                            print("Alerta no enviada: streaming activo.")
+            else:
+                if stage == "falling":
                     stage = "standing"
                     print(f"Se ha levantado en x={x}, y={y}")
                     cv2.putText(image, 'standing', (320, 240), 
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
-                    fall_start_time = None  # Resetear temporizador
+                    fall_start_time = None
         except:
               pass
         # Render curl counter

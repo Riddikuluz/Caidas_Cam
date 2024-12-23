@@ -2,10 +2,8 @@ import threading
 import time
 import subprocess
 import os
-import signal
 from dotenv import load_dotenv
-from fallDetection.run_fall_detection import run_fall_detection
-from fallDetection.response_listener import ResponseListener
+from response_listener import ResponseListener
 
 load_dotenv()
 
@@ -13,21 +11,23 @@ stop_detection_event = threading.Event()
 stop_streaming_event = threading.Event()
 
 ffmpeg_process = None
+is_streaming = False
 
 def detection_worker():
     try:
         print("Iniciando deteccion de caidas...")
-        run_fall_detection()
+        subprocess.run(["python", "./fall_detector.py"])
     except Exception as e:
         print(f"Error en la deteccion de caidas: {e}")
 
 def streaming_worker():
+    global is_streaming
     listener = ResponseListener(stop_streaming_event)
     print("Escuchando respuestas para streaming...")
 
     while not stop_detection_event.is_set():
         try:
-            if listener.response_received and not stop_streaming_event.is_set():
+            if listener.response_received and not stop_streaming_event.is_set() and not is_streaming:
                 print("Solicitud de inicio de streaming recibida.")
                 start_streaming(listener.stream_type)
                 listener.response_received = False
@@ -39,11 +39,12 @@ def streaming_worker():
 
 def stop_streaming():
     global ffmpeg_process
-    
+    global is_streaming
+
     if ffmpeg_process:
         try:
             ffmpeg_process.terminate()  
-            time.sleep(5)
+            time.sleep(1)
             if ffmpeg_process.poll() is None:
                 ffmpeg_process.kill()  
             ffmpeg_process.wait()
@@ -52,6 +53,7 @@ def stop_streaming():
             print(f"Error al detener FFmpeg: {e}")
         finally:
             ffmpeg_process = None
+            is_streaming = False
     else:
         print("No hay un proceso FFmpeg activo.")
 
@@ -60,6 +62,8 @@ def start_streaming(stream_type):
     global ffmpeg_process
     stop_streaming_event.clear()
     stop_streaming()
+
+    global is_streaming
 
     if stream_type == "monitor":
         ingest_url = os.getenv("INGEST_URL_Monitor")
@@ -92,6 +96,7 @@ def start_streaming(stream_type):
     ]
 
     print(f"Iniciando streaming ({stream_type}) con comando: {' '.join(ffmpeg_command)}")
+    is_streaming = True
 
     try:
         ffmpeg_process = subprocess.Popen(
