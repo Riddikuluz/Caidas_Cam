@@ -4,14 +4,23 @@ import subprocess
 import os
 from dotenv import load_dotenv
 from response_listener import ResponseListener
+import json
 
 load_dotenv()
+
+STATE_FILE = "streaming_state.json"
 
 stop_detection_event = threading.Event()
 stop_streaming_event = threading.Event()
 
 ffmpeg_process = None
 is_streaming = False
+
+def update_streaming_state(is_streaming):
+    with open(STATE_FILE, 'w') as f:
+        json.dump({"is_streaming": is_streaming}, f)
+
+update_streaming_state(is_streaming)
 
 def detection_worker():
     try:
@@ -27,7 +36,7 @@ def streaming_worker():
 
     while not stop_detection_event.is_set():
         try:
-            if listener.response_received and not stop_streaming_event.is_set() and not is_streaming:
+            if listener.response_received and not stop_streaming_event.is_set():
                 print("Solicitud de inicio de streaming recibida.")
                 start_streaming(listener.stream_type)
                 listener.response_received = False
@@ -43,10 +52,10 @@ def stop_streaming():
 
     if ffmpeg_process:
         try:
-            ffmpeg_process.terminate()  
+            ffmpeg_process.terminate()
             time.sleep(1)
             if ffmpeg_process.poll() is None:
-                ffmpeg_process.kill()  
+                ffmpeg_process.kill()
             ffmpeg_process.wait()
             print("FFmpeg detenido correctamente.")
         except Exception as e:
@@ -54,16 +63,16 @@ def stop_streaming():
         finally:
             ffmpeg_process = None
             is_streaming = False
+            update_streaming_state(is_streaming)  # Actualiza el estado
     else:
         print("No hay un proceso FFmpeg activo.")
 
-
 def start_streaming(stream_type):
     global ffmpeg_process
+    global is_streaming
+
     stop_streaming_event.clear()
     stop_streaming()
-
-    global is_streaming
 
     if stream_type == "monitor":
         ingest_url = os.getenv("INGEST_URL_Monitor")
@@ -75,7 +84,7 @@ def start_streaming(stream_type):
         ingest_url = os.getenv("INGEST_URL_Ambiental")
         stream_key = os.getenv("STREAM_KEY_Ambiental")
     else:
-        print("Tipo de streaming no valido.")
+        print("Tipo de streaming no válido.")
         return
 
     ffmpeg_command = [
@@ -97,6 +106,7 @@ def start_streaming(stream_type):
 
     print(f"Iniciando streaming ({stream_type}) con comando: {' '.join(ffmpeg_command)}")
     is_streaming = True
+    update_streaming_state(is_streaming)
 
     try:
         ffmpeg_process = subprocess.Popen(
@@ -108,7 +118,7 @@ def start_streaming(stream_type):
 
         while not stop_streaming_event.is_set():
             if ffmpeg_process.poll() is not None:
-                print("FFmpeg termino inesperadamente.")
+                print("FFmpeg terminó inesperadamente.")
                 break
             time.sleep(1)
 

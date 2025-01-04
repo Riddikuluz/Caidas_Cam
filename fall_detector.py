@@ -3,7 +3,6 @@ import mediapipe as mp
 import numpy as np
 import platform
 import time
-import main
 from send_alert import send_alert
 
 mp_drawing = mp.solutions.drawing_utils
@@ -27,7 +26,7 @@ def calculate_angle(a,b,c):
 if platform.system() != "Linux":
     cap = cv2.VideoCapture(0)  # Usar backend predeterminado en Windows/macOS
 else:
-    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    cap = cv2.VideoCapture(2, cv2.CAP_V4L2)
 
 # Verificar si la cámara se abrió correctamente
 if not cap.isOpened():
@@ -312,7 +311,7 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
             if Point_of_action_X is None or dot_BODY_X is None:
                 print("Error: Valores indefinidos para Point_of_action_X o dot_BODY_X")
                   
-            #case falling and standa
+            #case falling and standing
             falling = abs(fall) > 50
             standing = abs(fall) <= 50
             x = Point_of_action_X
@@ -331,14 +330,11 @@ with mp_pose.Pose(min_detection_confidence=0.9, min_tracking_confidence=0.9) as 
                         print(f"Error al calcular tiempo: {e}")
                         elapsed_time = 0
 
-                    if elapsed_time > time_2_alert:
-                        if not main.is_streaming:
-                            send_alert()
-                            print(f"Alerta enviada después de {elapsed_time:.2f}s")
-                            counter +=1
-                            fall_start_time = None
-                        else:
-                            print("Alerta no enviada: streaming activo.")
+                    if elapsed_time > time_2_alert:  # Más de 10 segundos en caída
+                        send_alert()
+                        print(f"Alerta enviada después de {elapsed_time:.2f}s")
+                        counter +=1
+                        fall_start_time = None  # Resetear temporizador 
             else:
                 if stage == "falling":
                     stage = "standing"
