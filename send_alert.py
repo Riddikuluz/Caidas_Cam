@@ -39,6 +39,9 @@ def publish_mqtt():
     print("Alerta enviada con éxito.")
 
 def send_alert():
+    print("Enviando alerta...")
+    publish_mqtt()
+    ''' 
     is_streaming = get_streaming_state()
     print("is_streaming:", is_streaming)
 
@@ -47,3 +50,4 @@ def send_alert():
     else:
         print("Enviando alerta...")
         publish_mqtt()
+    '''

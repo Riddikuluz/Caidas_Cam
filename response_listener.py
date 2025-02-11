@@ -1,4 +1,3 @@
-# response_listener.py
 import json
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import os
@@ -16,7 +15,7 @@ KEY_PATH = os.getenv("KEY_PATH")
 class ResponseListener:
     def __init__(self):
         self.response_received = False
-        self.action = None  # "start" o "stop"
+        self.action = None
         self.stream_type = None
         self.client = self._initialize_client()
 

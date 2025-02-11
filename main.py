@@ -1,4 +1,3 @@
-# main.py
 import threading
 import time
 import subprocess
@@ -9,12 +8,12 @@ import json
 
 load_dotenv()
 
-STATE_FILE = "streaming_state.json"
-
 stop_detection_event = threading.Event()
 
-# Diccionario para gestionar los procesos FFmpeg de cada stream
 ffmpeg_processes = {"monitor": None, "alerta": None, "ambiental": None}
+
+'''
+STATE_FILE = "streaming_state.json"
 
 def update_streaming_state():
     state = {stype: (proc is not None) for stype, proc in ffmpeg_processes.items()}
@@ -22,6 +21,7 @@ def update_streaming_state():
         json.dump(state, f)
 
 update_streaming_state()
+'''
 
 def detection_worker():
     try:
@@ -40,7 +40,6 @@ def streaming_worker():
                 stream_type = listener.stream_type
                 if listener.action == "start":
                     print(f"Solicitud de inicio para {stream_type} recibida.")
-                    # Lanzamos el inicio en un hilo separado para que corran en paralelo
                     t = threading.Thread(target=start_streaming, args=(stream_type,), daemon=True)
                     t.start()
                 elif listener.action == "stop":
@@ -70,18 +69,16 @@ def stop_streaming(stream_type):
             print(f"Error al detener FFmpeg ({stream_type}): {e}")
         finally:
             ffmpeg_processes[stream_type] = None
-            update_streaming_state()
+            #update_streaming_state()
     else:
         print(f"No hay un proceso FFmpeg activo para {stream_type}.")
 
 def start_streaming(stream_type):
     global ffmpeg_processes
-    # Si ya existe un stream activo para este tipo, lo detenemos antes
     if ffmpeg_processes.get(stream_type):
         print(f"Ya existe un streaming activo para {stream_type}, deteniéndolo...")
         stop_streaming(stream_type)
 
-    # Seleccionar los parámetros según el tipo de stream
     if stream_type == "monitor":
         ingest_url = os.getenv("INGEST_URL_Monitor")
         stream_key = os.getenv("STREAM_KEY_Monitor")
@@ -121,9 +118,8 @@ def start_streaming(stream_type):
             stderr=subprocess.PIPE,
         )
         ffmpeg_processes[stream_type] = proc
-        update_streaming_state()
+        #update_streaming_state()
 
-        # Monitoreamos el proceso; se quedará aquí hasta que termine o se le pida detenerlo
         while True:
             if proc.poll() is not None:
                 print(f"FFmpeg ({stream_type}) terminó inesperadamente.")
@@ -149,7 +145,6 @@ def main():
     except KeyboardInterrupt:
         print("\nFinalizando sistema...")
         stop_detection_event.set()
-        # Detenemos todos los streams activos
         for stream in list(ffmpeg_processes.keys()):
             stop_streaming(stream)
     finally:
