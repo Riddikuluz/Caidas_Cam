@@ -26,7 +26,7 @@ def calculate_angle(a,b,c):
 if platform.system() != "Linux":
     cap = cv2.VideoCapture(0)
 else:
-    cap = cv2.VideoCapture(2, cv2.CAP_V4L2)
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
 if not cap.isOpened():
     print("Error: No se pudo acceder a la cámara.")
