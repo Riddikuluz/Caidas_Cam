@@ -4,7 +4,6 @@ import subprocess
 import os
 import signal
 from dotenv import load_dotenv
-from fallDetection.run_fall_detection import run_fall_detection
 from fallDetection.response_listener import ResponseListener
 
 load_dotenv()
@@ -12,12 +11,16 @@ load_dotenv()
 stop_detection_event = threading.Event()
 stop_streaming_event = threading.Event()
 
-ffmpeg_process = None
+ffmpeg_processes = {
+    "monitor": None,
+    "alerta": None,
+    "ambiental": None
+}
 
 def detection_worker():
     try:
         print("📹 Iniciando detección de caídas...")
-        run_fall_detection()
+        subprocess.run(["python", "./fallDetection/fall_detector.py"])
     except Exception as e:
         print(f"⚠️ Error en la detección de caídas: {e}")
 
@@ -27,40 +30,46 @@ def streaming_worker():
 
     while not stop_detection_event.is_set():
         try:
-            if listener.response_received and not stop_streaming_event.is_set():
-                print(f"🎥 Iniciando streaming tipo: {listener.stream_type}")
-                start_streaming(listener.stream_type)
+            if listener.response_received:
+                stype = listener.stream_type
+                if listener.action == "start":
+                    print(f"🎥 Iniciando streaming ({stype}) solicitado.")
+                    t = threading.Thread(target=start_streaming, args=(stype,), daemon=True)
+                    t.start()
+                elif listener.action == "stop":
+                    print(f"🛑 Deteniendo streaming ({stype}) solicitado.")
+                    stop_streaming(stype)
                 listener.response_received = False
+                listener.action = None
+                listener.stream_type = None
         except Exception as e:
             print(f"⚠️ Error en el hilo de streaming: {e}")
         time.sleep(1)
-
     print("⏹️ Hilo de streaming detenido.")
 
-
-def stop_streaming():
-    global ffmpeg_process
-    
-    if ffmpeg_process:
+def stop_streaming(stream_type):
+    global ffmpeg_processes
+    proc = ffmpeg_processes.get(stream_type)
+    if proc:
         try:
-            ffmpeg_process.terminate()  
+            proc.terminate()  
             time.sleep(5)
-            if ffmpeg_process.poll() is None:
-                ffmpeg_process.kill()  
-            ffmpeg_process.wait()
-            print("✅ FFmpeg detenido correctamente.")
+            if proc.poll() is None:
+                proc.kill()  
+            proc.wait()
+            print(f"✅ FFmpeg ({stream_type}) detenido correctamente.")
         except Exception as e:
-            print(f"⚠️ Error al detener FFmpeg: {e}")
+            print(f"⚠️ Error al detener FFmpeg ({stream_type}): {e}")
         finally:
-            ffmpeg_process = None
+            ffmpeg_processes[stream_type] = None
     else:
-        print("🔍 No hay un proceso FFmpeg activo.")
-
+        print(f"🔍 No hay un proceso FFmpeg activo para {stream_type}.")
 
 def start_streaming(stream_type):
-    global ffmpeg_process
-    stop_streaming_event.clear()
-    stop_streaming()
+    global ffmpeg_processes
+    if ffmpeg_processes.get(stream_type):
+        print(f"⚠️ Ya existe un streaming activo para {stream_type}. Deteniéndolo...")
+        stop_streaming(stream_type)
 
     if stream_type == "monitor":
         ingest_url = os.getenv("INGEST_URL_Monitor")
@@ -91,38 +100,38 @@ def start_streaming(stream_type):
         "-maxrate", "800k",
         "-bufsize", "1200k",
         "-f", "flv",
-        f'{ingest_url}{stream_key}'
+        f"{ingest_url}{stream_key}"
     ]
 
     print(f"Iniciando streaming ({stream_type}) con comando: {' '.join(ffmpeg_command)}")
 
     try:
-        ffmpeg_process = subprocess.Popen(
+        proc = subprocess.Popen(
             ffmpeg_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+        ffmpeg_processes[stream_type] = proc
 
         while not stop_streaming_event.is_set():
-            if ffmpeg_process.poll() is not None:
-                print("⚠️ FFmpeg terminó inesperadamente.")
+            if proc.poll() is not None:
+                print(f"⚠️ FFmpeg ({stream_type}) terminó inesperadamente.")
                 break
             time.sleep(1)
 
-        if stop_streaming_event.is_set() and ffmpeg_process.poll() is None:
-            print("🛑 Deteniendo streaming con comando 'q'.")
-            ffmpeg_process.stdin.write(b'q\n')
-            ffmpeg_process.stdin.flush()
+        if stop_streaming_event.is_set() and proc.poll() is None:
+            print(f"🛑 Deteniendo streaming ({stream_type}) con comando 'q'.")
+            proc.stdin.write(b'q\n')
+            proc.stdin.flush()
     except Exception as e:
-        print(f"⚠️ Error durante el streaming: {e}")
+        print(f"⚠️ Error durante el streaming ({stream_type}): {e}")
     finally:
-        stop_streaming()
-
+        stop_streaming(stream_type)
 
 def main():
     print("🏁 Iniciando sistema de detección de caídas...")
-    
+
     threads = []
 
     detection_thread = threading.Thread(target=detection_worker, daemon=True)
@@ -141,9 +150,9 @@ def main():
         print("\n⛔ Finalizando sistema...")
         stop_detection_event.set()
         stop_streaming_event.set()
+        for stype in ffmpeg_processes.keys():
+            stop_streaming(stype)
     finally:
-        stop_detection_event.set()
-        stop_streaming_event.set()
         for thread in threads:
             thread.join()
         print("✅ Sistema finalizado.")
