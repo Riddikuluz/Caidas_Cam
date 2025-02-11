@@ -63,7 +63,7 @@ def stop_streaming():
         finally:
             ffmpeg_process = None
             is_streaming = False
-            update_streaming_state(is_streaming)  # Actualiza el estado
+            update_streaming_state(is_streaming)
     else:
         print("No hay un proceso FFmpeg activo.")
 

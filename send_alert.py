@@ -46,4 +46,4 @@ def send_alert():
         print("No se puede enviar una alerta si se está transmitiendo.")
     else:
         print("Enviando alerta...")
-        #publish_mqtt()
+        publish_mqtt()
