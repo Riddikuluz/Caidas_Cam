@@ -1,5 +1,4 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-import json
 import os
 from dotenv import load_dotenv
 import json
@@ -12,15 +11,6 @@ TOPIC = os.getenv("TOPIC")
 CA_PATH = os.getenv("CA_PATH")
 CERT_PATH = os.getenv("CERT_PATH")
 KEY_PATH = os.getenv("KEY_PATH")
-STATE_FILE = "streaming_state.json"
-
-def get_streaming_state():
-    try:
-        with open(STATE_FILE, 'r') as f:
-            state = json.load(f)
-            return state.get("is_streaming", False)
-    except FileNotFoundError:
-        return False
 
 def publish_mqtt():
     client = AWSIoTMQTTClient(CLIENT_ID)
@@ -39,15 +29,5 @@ def publish_mqtt():
     print("Alerta enviada con éxito.")
 
 def send_alert():
-    print("Enviando alerta...")
     publish_mqtt()
-    ''' 
-    is_streaming = get_streaming_state()
-    print("is_streaming:", is_streaming)
-
-    if is_streaming:
-        print("No se puede enviar una alerta si se está transmitiendo.")
-    else:
-        print("Enviando alerta...")
-        publish_mqtt()
-    '''
+    print("Alerta enviada.")

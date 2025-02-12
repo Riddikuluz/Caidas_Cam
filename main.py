@@ -4,24 +4,12 @@ import subprocess
 import os
 from dotenv import load_dotenv
 from response_listener import ResponseListener
-import json
 
 load_dotenv()
 
 stop_detection_event = threading.Event()
 
 ffmpeg_processes = {"monitor": None, "alerta": None, "ambiental": None}
-
-'''
-STATE_FILE = "streaming_state.json"
-
-def update_streaming_state():
-    state = {stype: (proc is not None) for stype, proc in ffmpeg_processes.items()}
-    with open(STATE_FILE, 'w') as f:
-        json.dump(state, f)
-
-update_streaming_state()
-'''
 
 def detection_worker():
     try:
@@ -45,7 +33,6 @@ def streaming_worker():
                 elif listener.action == "stop":
                     print(f"Solicitud de detención para {stream_type} recibida.")
                     stop_streaming(stream_type)
-                # Se limpia la orden
                 listener.response_received = False
                 listener.action = None
                 listener.stream_type = None
@@ -69,7 +56,6 @@ def stop_streaming(stream_type):
             print(f"Error al detener FFmpeg ({stream_type}): {e}")
         finally:
             ffmpeg_processes[stream_type] = None
-            #update_streaming_state()
     else:
         print(f"No hay un proceso FFmpeg activo para {stream_type}.")
 
@@ -118,7 +104,6 @@ def start_streaming(stream_type):
             stderr=subprocess.PIPE,
         )
         ffmpeg_processes[stream_type] = proc
-        #update_streaming_state()
 
         while True:
             if proc.poll() is not None:
