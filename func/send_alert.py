@@ -30,4 +30,3 @@ def publish_mqtt():
 
 def send_alert():
     publish_mqtt()
-    print("Alerta enviada.")

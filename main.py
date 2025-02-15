@@ -3,7 +3,7 @@ import time
 import subprocess
 import os
 from dotenv import load_dotenv
-from response_listener import ResponseListener
+from func.response_listener import ResponseListener
 
 load_dotenv()
 
@@ -14,7 +14,7 @@ ffmpeg_processes = {"monitor": None, "alerta": None, "ambiental": None}
 def detection_worker():
     try:
         print("Iniciando detección de caídas...")
-        subprocess.run(["python", "./fall_detector.py"])
+        subprocess.run(["python", "./func/fall_detector.py"])
     except Exception as e:
         print(f"Error en la detección de caídas: {e}")
 

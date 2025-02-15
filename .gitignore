@@ -1,4 +1,4 @@
 /certs/
-/__pycache__/
+/func/__pycache__/
 .env
 /my_env/
