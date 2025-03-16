@@ -50,11 +50,6 @@ class ResponseListener:
                 self.response_received = True
                 self.action = "start"
                 self.stream_type = "alerta"
-            elif action == "start_stream_ambiental":
-                print("Solicitud de inicio de streaming (Ambiental) recibida.")
-                self.response_received = True
-                self.action = "start"
-                self.stream_type = "ambiental"
             elif action == "stop_stream_monitor":
                 print("Solicitud de detención de streaming (Monitor) recibida.")
                 self.response_received = True
@@ -65,11 +60,6 @@ class ResponseListener:
                 self.response_received = True
                 self.action = "stop"
                 self.stream_type = "alerta"
-            elif action == "stop_stream_ambiental":
-                print("Solicitud de detención de streaming (Ambiental) recibida.")
-                self.response_received = True
-                self.action = "stop"
-                self.stream_type = "ambiental"
             else:
                 print("Acción desconocida.")
         except json.JSONDecodeError:
