@@ -40,7 +40,7 @@ Este repositorio contiene la implementación modular y actualizada de un sistema
 
 ### Requisitos Previos
 
-- **Python 3.7** o superior.
+- **Python 3.7** hasta **3.12**.
 - **PIP** (gestor de paquetes de Python).
 - Dependencias principales:
   - OpenCV (paquete `opencv-contrib-python`).
@@ -104,9 +104,6 @@ STREAM_KEY_Monitor=tu_stream_key_monitor
 
 INGEST_URL_Alerta=tu_ingest_url_alerta
 STREAM_KEY_Alerta=tu_stream_key_alerta
-
-INGEST_URL_Ambiental=tu_ingest_url_ambiental
-STREAM_KEY_Ambiental=tu_stream_key_ambiental
 ```
 
 Se deberán reemplazar los valores por la información correspondiente a la configuración específica.
