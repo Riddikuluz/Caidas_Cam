@@ -108,6 +108,22 @@ STREAM_KEY_Alerta=tu_stream_key_alerta
 
 Se deberán reemplazar los valores por la información correspondiente a la configuración específica.
 
+### Configuración de VNC y X11 (Rama x11)
+
+Para la implementación en sistemas Linux que utilizan la rama **x11**, es necesario configurar adecuadamente el entorno VNC. Esta configuración ha sido probada específicamente en **Debian 12 (Bookworm)** ejecutándose en Raspberry Pi 4B.
+
+Ejecute los siguientes comandos para detener y deshabilitar el servicio wayvnc:
+
+```bash
+# Detener el servicio wayvnc
+sudo systemctl stop wayvnc
+
+# Deshabilitar el servicio wayvnc para que no se inicie automáticamente
+sudo systemctl disable wayvnc
+```
+
+**Nota**: Esta configuración es específica para sistemas que requieren acceso directo a X11 para la captura de pantalla mediante x11grab. El sistema ha sido validado en Debian 12 (Bookworm) sobre hardware Raspberry Pi.
+
 ## Ejecución
 
 ### Iniciar el Sistema de Monitoreo
